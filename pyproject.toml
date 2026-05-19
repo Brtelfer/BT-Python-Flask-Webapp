@@ -1,1 +1,12 @@
-
+[project]
+name = "fl1"
+version = "0.1.0"
+description = "Python/SQL Webapp Practice"
+readme = "README.md"
+requires-python "≥ 3.13"
+dependencies = [
+  "dotenv ≥ 0.9.9",
+  "dotenvy ≥ 0.2.0",
+  "flask ≥ 3.1.2",
+  "psycopg2-binary ≥ 2.9.11"
+]
