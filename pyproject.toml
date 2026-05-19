@@ -3,7 +3,7 @@ name = "fl1"
 version = "0.1.0"
 description = "Python/SQL Webapp Practice"
 readme = "README.md"
-requires-python "≥ 3.13"
+requires-python = "≥ 3.13"
 dependencies = [
   "dotenv ≥ 0.9.9",
   "dotenvy ≥ 0.2.0",
