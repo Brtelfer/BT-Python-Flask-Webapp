@@ -8,15 +8,21 @@ from flask import Flask, render_template, request, redirect, url_for, session, j
 from pydub import AudioSegment
 from pytubefix import YouTube
 from dotenv import load_dotenv
+from werkzeug.utils import secure_filename
 
-load_dotenv()  
+load_dotenv()
 
-# ---- App & config ----
 app = Flask(__name__)
+app.secret_key = os.getenv("FLASK_SECRET_KEY", "AS*#ncAKE#*$F25")
+
+# ---- Directories ----
+UPLOAD_DIR = os.path.join(os.path.dirname(__file__), "uploads")
+OUTPUT_DIR = os.path.join(os.path.dirname(__file__), "outputs")
+os.makedirs(UPLOAD_DIR, exist_ok=True)
+os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 # ---- Database ----
 def get_db():
-    """Return a fresh connection. Short-lived, per-request."""
     return mysql.connector.connect(
         host=os.getenv("DB_HOST", "localhost"),
         user=os.getenv("DB_USER", "root"),
@@ -24,35 +30,12 @@ def get_db():
         database=os.getenv("DB_NAME", "BTDB"),
     )
 
-# ---- Schema ----
 def init_db():
-    """Creates the database schema if it doesn't exist."""
     with get_db() as db:
         cur = db.cursor()
-        
-        # 1. Independent tables first
-        cur.execute("""
-            CREATE TABLE IF NOT EXISTS `media_type` (
-                `type_id` int AUTO_INCREMENT PRIMARY KEY,
-                `type_name` varchar(50) UNIQUE NOT NULL
-            )
-        """)
-        
-        cur.execute("""
-            CREATE TABLE IF NOT EXISTS `format` (
-                `format_id` int AUTO_INCREMENT PRIMARY KEY,
-                `format_name` varchar(20) UNIQUE NOT NULL
-            )
-        """)
-        
-        cur.execute("""
-            CREATE TABLE IF NOT EXISTS `tag` (
-                `tag_id` int AUTO_INCREMENT PRIMARY KEY,
-                `tag_name` varchar(50) UNIQUE NOT NULL
-            )
-        """)
-
-        # 2. Tables with Foreign Keys
+        cur.execute("""CREATE TABLE IF NOT EXISTS `media_type` (`type_id` int AUTO_INCREMENT PRIMARY KEY, `type_name` varchar(50) UNIQUE NOT NULL)""")
+        cur.execute("""CREATE TABLE IF NOT EXISTS `format` (`format_id` int AUTO_INCREMENT PRIMARY KEY, `format_name` varchar(20) UNIQUE NOT NULL)""")
+        cur.execute("""CREATE TABLE IF NOT EXISTS `tag` (`tag_id` int AUTO_INCREMENT PRIMARY KEY, `tag_name` varchar(50) UNIQUE NOT NULL)""")
         cur.execute("""
             CREATE TABLE IF NOT EXISTS `media` (
                 `media_id` int AUTO_INCREMENT PRIMARY KEY,
@@ -66,7 +49,6 @@ def init_db():
                 FOREIGN KEY (`type_id`) REFERENCES `media_type`(`type_id`)
             )
         """)
-
         cur.execute("""
             CREATE TABLE IF NOT EXISTS `media_tag` (
                 `media_id` int NOT NULL,
@@ -76,7 +58,6 @@ def init_db():
                 FOREIGN KEY (`tag_id`) REFERENCES `tag`(`tag_id`)
             )
         """)
-
         cur.execute("""
             CREATE TABLE IF NOT EXISTS `conversion` (
                 `conversion_id` int AUTO_INCREMENT PRIMARY KEY,
@@ -94,43 +75,32 @@ def init_db():
 
 # ---- Conversions ----
 def mp3_to_txt(mp3_file_path: str) -> str:
-    model = whisper.load_model("medium")
+    model = whisper.load_model("base") 
     output = model.transcribe(
-        mp3_file_path,
-        fp16=False,                       
-        language="en",
-        condition_on_previous_text=False,
-        beam_size=5,
-        temperature=0.0,
-        no_speech_threshold=0.7,
+        mp3_file_path, fp16=False, language="en",
+        condition_on_previous_text=False, beam_size=5,
+        temperature=0.0, no_speech_threshold=0.7,
     )
     return output["text"]
 
 def mp4_to_mp3(mp4_file_path: str, mp3_file_path: str) -> str:
-    AudioSegment.from_file(mp4_file_path, format="mp4") \
-        .export(mp3_file_path, format="mp3")
+    AudioSegment.from_file(mp4_file_path, format="mp4").export(mp3_file_path, format="mp3")
     return mp3_file_path
 
 def pdf_to_epub(pdf_file_path: str, epub_file_path: str) -> str:
     doc = fitz.open(pdf_file_path)
     html_content = "".join(page.get_text("xhtml") for page in doc)
     doc.close()
-
     pypandoc.convert_text(
-        html_content,
-        "epub",
-        format="html",
-        outputfile=epub_file_path,
+        html_content, "epub", format="html", outputfile=epub_file_path,
         extra_args=["--metadata", "title=Converted Document"],
     )
     return epub_file_path
 
 def youtube_to_mp3(youtube_url: str, output_dir: str) -> str:
-    """Download audio-only stream. Returns the actual saved file path."""
     yt = YouTube(youtube_url)
     stream = yt.streams.get_audio_only()
-    saved_path = stream.download(output_path=output_dir)
-    return saved_path
+    return stream.download(output_path=output_dir)
 
 # ---- Routes ----
 @app.route("/")
@@ -142,7 +112,50 @@ def toggle():
     session["toggle"] = not session.get("toggle", False)
     return jsonify(state=session["toggle"])
 
-# ---- Bootstrap ----
+@app.route("/convert", methods=["POST"])
+def convert():
+    conv_type = request.form.get("conversion_type")
+    file = request.files.get("file")
+    
+    if not file or file.filename == '':
+        return jsonify(error="No file uploaded"), 400
+
+    filename = secure_filename(file.filename)
+    input_path = os.path.join(UPLOAD_DIR, filename)
+    file.save(input_path)
+
+    try:
+        if conv_type == "mp3_txt":
+            output_filename = filename.rsplit('.', 1)[0] + ".txt"
+            output_path = os.path.join(OUTPUT_DIR, output_filename)
+            text = mp3_to_txt(input_path)
+            with open(output_path, "w", encoding="utf-8") as f:
+                f.write(text)
+                
+        elif conv_type == "mp4_mp3":
+            output_filename = filename.rsplit('.', 1)[0] + ".mp3"
+            output_path = os.path.join(OUTPUT_DIR, output_filename)
+            mp4_to_mp3(input_path, output_path)
+            
+        elif conv_type == "pdf_epub":
+            output_filename = filename.rsplit('.', 1)[0] + ".epub"
+            output_path = os.path.join(OUTPUT_DIR, output_filename)
+            pdf_to_epub(input_path, output_path)
+            
+        else:
+            return jsonify(error="Invalid conversion type"), 400
+
+        return jsonify(ok=True, output=output_filename)
+
+    except Exception as e:
+        print(f"Conversion Error: {e}")
+        return jsonify(error=str(e)), 500
+
 if __name__ == "__main__":
-    init_db()                # schema creation only when actually running
+    try:
+        init_db()
+        print("✅ Database initialized successfully.")
+    except Exception as e:
+        print(f"⚠️ Database connection failed: {e}")
+        
     app.run(debug=True)
