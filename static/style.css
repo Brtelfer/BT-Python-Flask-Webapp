@@ -1,127 +1,177 @@
 /* ===== Base ===== */
 body {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  background: linear-gradient(135deg, #e4ebf5, #cfd9e6);
-  margin: 0;
-  padding: 40px;
-  color: #2c3e50;
-  transition: background 0.3s, color 0.3s;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: linear-gradient(135deg, #e4ebf5, #cfd9e6);
+    margin: 0;
+    padding: 40px;
+    color: #2c3e50;
+    transition: background 0.3s, color 0.3s;
 }
 
 h1, h2 {
-  text-align: center;
-  font-weight: 600;
+    text-align: center;
+    font-weight: 600;
 }
 
 /* ===== Table Card ===== */
 table {
-  width: 80%;
-  margin: 20px auto;
-  border-collapse: collapse;
-  background: #f7f9fc;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
-  border-radius: 10px;
-  overflow: hidden;
+    width: 80%;
+    margin: 20px auto;
+    border-collapse: collapse;
+    background: #f7f9fc;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+    border-radius: 10px;
+    overflow: hidden;
 }
 
 thead {
-  background: linear-gradient(90deg, #6a8db7, #8fb3da);
-  color: white;
+    background: linear-gradient(90deg, #6a8db7, #8fb3da);
+    color: white;
 }
 
 th, td {
-  padding: 14px;
-  text-align: center;
+    padding: 14px;
+    text-align: center;
 }
 
 tbody tr:nth-child(even) {
-  background: #eef3f9;
+    background: #eef3f9;
 }
 
 tbody tr:hover {
-  background: #dde7f3;
+    background: #dde7f3;
 }
 
 /* ===== Inputs ===== */
 input[type="text"] {
-  padding: 6px 8px;
-  border: 1px solid #b8c7d9;
-  border-radius: 6px;
-  background: #f1f5fb;
-  color: #2c3e50;
-  width: 90px;
+    padding: 6px 8px;
+    border: 1px solid #b8c7d9;
+    border-radius: 6px;
+    background: #f1f5fb;
+    color: #2c3e50;
+    width: 90px;
 }
 
 /* ===== Buttons ===== */
 input[type="submit"] {
-  padding: 7px 14px;
-  border: none;
-  border-radius: 7px;
-  background: linear-gradient(90deg, #5f86b2, #7ea7d8);
-  color: white;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
+    padding: 7px 14px;
+    border: none;
+    border-radius: 7px;
+    background: linear-gradient(90deg, #5f86b2, #7ea7d8);
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
 }
 
 input[type="submit"]:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
 /* ===== Create Card ===== */
 form[action="/create"] {
-  display: block;
-  width: 320px;
-  margin: 30px auto;
-  padding: 18px;
-  background: #f7f9fc;
-  border-radius: 10px;
-  box-shadow: 0 8px 18px rgba(0,0,0,0.08);
-  text-align: center;
+    display: block;
+    width: 320px;
+    margin: 30px auto;
+    padding: 18px;
+    background: #f7f9fc;
+    border-radius: 10px;
+    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.08);
+    text-align: center;
 }
 
 form[action="/create"] input[type="text"] {
-  width: 90%;
-  margin-bottom: 10px;
+    width: 90%;
+    margin-bottom: 10px;
 }
 
 form[action="/create"] input[type="submit"] {
-  width: 100%;
+    width: 100%;
 }
+
+/* ===== Toggle Button (top-level, outside dark mode!) ===== */
+.toggle-btn {
+    padding: 10px 28px;
+    border: none;
+    border-radius: 20px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.25s, transform 0.1s;
+}
+.toggle-btn.on  { background: #4CAF50; color: #fff; }
+.toggle-btn.off { background: #ccc;    color: #333; }
+
+.toggle-btn:hover:not(:disabled)  { filter: brightness(0.95); }
+.toggle-btn:active:not(:disabled) { transform: scale(0.97); }
+.toggle-btn:disabled              { opacity: 0.6; cursor: wait; }
 
 /* ===== Dark Mode ===== */
 @media (prefers-color-scheme: dark) {
-  body {
-    background: linear-gradient(135deg, #1c2330, #0f1622);
-    color: #e5ecf5;
-  }
+    body {
+        background: linear-gradient(135deg, #1c2330, #0f1622);
+        color: #e5ecf5;
+    }
 
-  table {
-    background: #1f2a38;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
-  }
+    table {
+        background: #1f2a38;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+    }
 
-  thead {
-    background: linear-gradient(90deg, #3c5c85, #5479a6);
-  }
+    thead {
+        background: linear-gradient(90deg, #3c5c85, #5479a6);
+    }
 
-  tbody tr:nth-child(even) {
-    background: #243244;
-  }
+    tbody tr:nth-child(even) {
+        background: #243244;
+    }
 
-  tbody tr:hover {
-    background: #2d3e55;
-  }
+    tbody tr:hover {
+        background: #2d3e55;
+    }
 
-  input[type="text"] {
-    background: #1a2431;
-    border: 1px solid #3a4b60;
-    color: #e5ecf5;
-  }
+    input[type="text"] {
+        background: #1a2431;
+        border: 1px solid #3a4b60;
+        color: #e5ecf5;
+    }
 
-  form[action="/create"] {
-    background: #1f2a38;
-  }
+    form[action="/create"] {
+        background: #1f2a38;
+    }
+
+    /* Dark-mode toggle variant */
+    .toggle-btn.off { background: #3a4b60; color: #e5ecf5; }
+
+    /* Make the conv-options look like toggle buttons */
+.conversion-grid {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 8px;
 }
 
+.conv-option {
+    padding: 10px 16px;
+    border: 2px solid #c7d3e3;
+    border-radius: 10px;
+    background: #f7f9fc;
+    color: #2c3e50;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.conv-option:hover   { border-color: #6a8db7; }
+.conv-option.active  { background: #6a8db7; border-color: #6a8db7; color: #fff; }
+
+.file-name  { margin-left: 12px; color: #555; font-size: 14px; }
+.status     { margin-top: 14px; min-height: 1.2em; font-size: 14px; }
+
+@media (prefers-color-scheme: dark) {
+    .conv-option        { background: #1f2a38; border-color: #3a4b60; color: #e5ecf5; }
+    .conv-option.active { background: #5479a6; border-color: #5479a6; color: #fff; }
+    .file-name          { color: #c7d3e3; }
+}
+
+}

@@ -1,59 +1,72 @@
-
-<html>
-	<head>
-  <title>CRUD App</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-  <style>
-    table {
-      table-layout: auto;
-      width: 100%;
-    }
-    td:last-child {
-      width: 1%;
-      white-space: nowrap;
-    }
-  </style>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>File Conversion Tool</title>
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
 </head>
-  <body>
-    <h1>Test App</h1>
-    <table>
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>Name</th>
-          <th>Price</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for row in data %}
-        <tr>
-          <td>{{ row[0] }}</td>
-          <td>{{ row[1] }}</td>
-          <td>{{ row[2] }}</td>
-          <td>
-            <div style="display: flex; gap: 10px; align-items: center;">
-              <form action="/update" method="post" style="display: flex; gap: 5px; margin: 0;">
-                <input type="hidden" name="id" value="{{ row[0] }}">
-                <input type="text" name="name" value="{{ row[1] }}">
-                <input type="text" name="price" value="{{ row[2] }}">
-                <input type="submit" value="Update">
-              </form>
-              <form action="/delete" method="post" style="margin: 0;">
-                <input type="hidden" name="id" value="{{ row[0] }}">
-                <input type="submit" value="Delete">
-              </form>
-            </div>
-          </td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-    <h2>Create a new product</h2>
-    <form action="/create" method="post">
-      <input type="text" name="name" placeholder="Name" autocomplete="off">
-      <input type="text" name="price" placeholder="Price" >
-      <input type="submit" value="Create">
-    </form>
-  </body>
+<body>
+    <div class="app-container">
+        <header class="app-header">
+            <i class="fas fa-arrow-right-arrow-left"></i>
+            <h1>File Conversion Tool</h1>
+        </header>
+
+        <div class="main-content">
+            <section class="left-panel">
+
+                <!-- ============ Conversion type selector ============ -->
+                <div class="interface-selector">
+                    <label><i class="fas fa-arrows-rotate"></i> Conversion Type</label>
+                    <div class="conversion-grid" id="conversionGrid">
+                        <button type="button" class="conv-option active" data-type="mp3_txt">
+                            <i class="fas fa-file-audio"></i> MP3 → TXT
+                        </button>
+                        <button type="button" class="conv-option" data-type="mp4_mp3">
+                            <i class="fas fa-file-video"></i> MP4 → MP3
+                        </button>
+                        <button type="button" class="conv-option" data-type="pdf_epub">
+                            <i class="fas fa-file-pdf"></i> PDF → ePub
+                        </button>
+                    </div>
+                </div>
+
+                <!-- ============ File input ============ -->
+                <div class="input-area">
+                    <h3><i class="fas fa-upload"></i> Input File</h3>
+                    <div class="file-input-wrapper">
+                        <!-- accept attribute is set by JS on selection change -->
+                        <input type="file" id="fileInput" style="display:none"
+                               accept=".mp3,audio/mpeg" />
+                        <div class="file-input-row">
+                            <button type="button" class="browse-btn"
+                                    onclick="document.getElementById('fileInput').click()">
+                                <i class="fas fa-folder-open"></i> Browse
+                            </button>
+                            <span id="fileName" class="file-name">No file selected</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ============ Actions ============ -->
+                <div class="action-buttons">
+                    <button type="button" id="convertBtn" class="btn btn-primary">
+                        <i class="fas fa-play"></i> Convert
+                    </button>
+                    <button type="button" id="resetBtn" class="btn btn-secondary">
+                        <i class="fas fa-rotate"></i> Reset
+                    </button>
+                </div>
+
+                <p id="status" class="status" role="status"></p>
+            </section>
+        </div>
+    </div>
+
+    <script defer src="{{ url_for('static', filename='toggle.js') }}"></script>
+    <script defer src="{{ url_for('static', filename='convert.js') }}"></script>
+</body>
 </html>
