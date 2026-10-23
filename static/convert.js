@@ -54,10 +54,10 @@ convertBtn?.addEventListener("click", async () => {
         const data = await res.json();
 
         if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
-        statusEl.textContent = `✅ Done — saved as ${data.output}`;
+        statusEl.textContent = `Done — saved as ${data.output}`;
     } catch (err) {
         console.error(err);
-        statusEl.textContent = `❌ ${err.message}`;
+        statusEl.textContent = `${err.message}`;
     } finally {
         convertBtn.disabled = false;
     }
